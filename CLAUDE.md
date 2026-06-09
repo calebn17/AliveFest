@@ -39,3 +39,4 @@ python3 -m http.server 8000 -d allivefest.website
 - **Image hosting migration**: OG/Twitter meta images have been moved from `framerusercontent.com` CDN URLs to local `image_assets/` paths. When adding new pages or updating meta tags, use relative paths to `image_assets/` (e.g., `../image_assets/Photo%20Name.png` from subpages).
 - **File naming**: Image filenames contain spaces (e.g., `Girl at Fitness Festival.png`). Use `%20` encoding in HTML references.
 - **No package.json / no dependencies**: There are no npm packages, linters, or test suites to run.
+- **Framer CMS body text**: Editing Body Text on day subpages requires SSR injection, handover richtext, visibility fixes, and often a post-hydration restore script — see [MEMORY.md](MEMORY.md).
