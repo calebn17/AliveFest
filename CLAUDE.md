@@ -23,6 +23,8 @@ This is a **no-build static site**. There is no bundler, framework, or build ste
 
 Pushes to `main` auto-deploy via GitHub Actions (`.github/workflows/deploy.yml`). The workflow uploads `allivefest.website/` as a GitHub Pages artifact — no build step involved.
 
+**Custom domain**: `https://thealivefest.com` — configured via `allivefest.website/CNAME`. DNS is managed through Namecheap (4 A records pointing to GitHub Pages IPs + a `www` CNAME to `calebn17.github.io`). HTTPS is enforced in GitHub Pages settings.
+
 ## Local Development
 
 Open any HTML file directly in a browser, or serve locally:
