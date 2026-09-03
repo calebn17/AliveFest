@@ -43,9 +43,87 @@
     });
   }
 
+  var JOIN_US_LABEL = "Join us!";
+  var WAITLIST_LABEL = "Join the waitlist";
+
+  function isDayOverviewPage() {
+    return normalizePath(window.location.pathname) === "/day";
+  }
+
+  function restoreJoinUsButton() {
+    if (!isDayOverviewPage()) return;
+    document.querySelectorAll('a[href*="events.sweatpals.com/1dcead6c"]').forEach(function (el) {
+      var walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null);
+      var node;
+      while ((node = walker.nextNode())) {
+        if (node.nodeValue && node.nodeValue.indexOf(WAITLIST_LABEL) !== -1) {
+          node.nodeValue = node.nodeValue.replace(WAITLIST_LABEL, JOIN_US_LABEL);
+        }
+      }
+    });
+  }
+
+  var FOLLOW_US_LABEL = "Follow Us";
+  var TICKETS_ON_SALE_LABEL = "Tickets on sale July 1";
+
+  function restoreFollowUsLabel() {
+    document.querySelectorAll("h2").forEach(function (el) {
+      var text = (el.textContent || "").trim();
+      if (text !== TICKETS_ON_SALE_LABEL && text !== TICKETS_ON_SALE_LABEL + ".") return;
+      if (el.firstChild && el.firstChild.nodeType === 3) {
+        el.firstChild.nodeValue = FOLLOW_US_LABEL;
+      } else {
+        el.textContent = FOLLOW_US_LABEL;
+      }
+      var link = el.closest("a[href]");
+      if (link && (link.textContent || "").trim() === FOLLOW_US_LABEL) {
+        link.removeAttribute("href");
+        link.removeAttribute("target");
+        link.style.pointerEvents = "none";
+        link.style.cursor = "default";
+      }
+    });
+  }
+
+  var HOME_JOIN_US_LABEL = "Join Us";
+  var HOME_PARTNER_LABEL = "Join as a Partner";
+  var TICKET_URL = "https://events.sweatpals.com/1dcead6c";
+
+  function isHomePage() {
+    var p = normalizePath(window.location.pathname);
+    return p === "/" || p === "";
+  }
+
+  function restoreHomeJoinUsButton() {
+    if (!isHomePage()) return;
+    document.querySelectorAll('#hero a[data-framer-name="Fill"], #hero a[data-framer-name="Fill S"]').forEach(function (el) {
+      if (el.getAttribute("href") !== TICKET_URL) {
+        el.setAttribute("href", TICKET_URL);
+        el.setAttribute("target", "_blank");
+        el.setAttribute("rel", "noopener");
+      }
+      var walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null);
+      var node;
+      while ((node = walker.nextNode())) {
+        var value = (node.nodeValue || "").trim();
+        if (!value) continue;
+        if (value === HOME_PARTNER_LABEL || value.toUpperCase() === "JOIN AS A PARTNER") {
+          node.nodeValue = node.nodeValue.replace(value, HOME_JOIN_US_LABEL);
+        }
+      }
+    });
+  }
+
+  function restoreAll() {
+    restoreBodyText();
+    restoreJoinUsButton();
+    restoreFollowUsLabel();
+    restoreHomeJoinUsButton();
+  }
+
   function scheduleBurst() {
     [0, 50, 150, 300, 500, 1000, 2000, 3000, 5000].forEach(function (ms) {
-      setTimeout(restoreBodyText, ms);
+      setTimeout(restoreAll, ms);
     });
   }
 
@@ -59,16 +137,12 @@
   }
 
   function startRestoring() {
-    restoreBodyText();
+    restoreAll();
     scheduleBurst();
 
-    setInterval(function () {
-      if (getPageKey()) restoreBodyText();
-    }, 250);
+    setInterval(restoreAll, 250);
 
-    var observer = new MutationObserver(function () {
-      if (getPageKey()) restoreBodyText();
-    });
+    var observer = new MutationObserver(restoreAll);
     var main = document.getElementById("main");
     if (main) {
       observer.observe(main, {
@@ -83,7 +157,7 @@
     hookHistory("replaceState");
     window.addEventListener("popstate", scheduleBurst);
     window.addEventListener("load", function () {
-      restoreBodyText();
+      restoreAll();
       scheduleBurst();
     });
   }
