@@ -43,7 +43,7 @@
     });
   }
 
-  var JOIN_US_LABEL = "Join us!";
+  var JOIN_US_LABEL = "Join us";
   var WAITLIST_LABEL = "Join the waitlist";
 
   function isDayOverviewPage() {
@@ -56,8 +56,11 @@
       var walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null);
       var node;
       while ((node = walker.nextNode())) {
-        if (node.nodeValue && node.nodeValue.indexOf(WAITLIST_LABEL) !== -1) {
+        if (!node.nodeValue) continue;
+        if (node.nodeValue.indexOf(WAITLIST_LABEL) !== -1) {
           node.nodeValue = node.nodeValue.replace(WAITLIST_LABEL, JOIN_US_LABEL);
+        } else if (node.nodeValue.indexOf("Join us!") !== -1) {
+          node.nodeValue = node.nodeValue.replace("Join us!", JOIN_US_LABEL);
         }
       }
     });
